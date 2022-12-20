@@ -14,6 +14,18 @@
 
 #define QUEUE_NUM 23
 
+static int kt_func(void *_param){
+    //struct kthread_param *tmp_param = (struct kthread_param *)_param;
+    // working loop
+    while(!kthread_should_stop()){
+        // scheduling packets here
+        printk("kthread function debug\n");
+        msleep(1);
+        //usleep_range(100, 200);
+    }
+    return 0;
+}
+
 struct gtp5g_dev *gtp5g_find_dev(struct net *src_net, int ifindex, int netnsfd)
 {
     struct gtp5g_dev *gtp = NULL;
@@ -121,6 +133,7 @@ const struct net_device_ops gtp5g_netdev_ops = {
 int dev_hashtable_new(struct gtp5g_dev *gtp, int hsize)
 {
     int i;
+    struct kthread_param k_param;
 
     gtp->addr_hash = kmalloc_array(hsize, sizeof(struct hlist_head),
         GFP_KERNEL);
@@ -187,6 +200,24 @@ int dev_hashtable_new(struct gtp5g_dev *gtp, int hsize)
         printk("Queue ID: %d\n", gtp->s_queue_array[i].s_queue_id);
         printk("Queue size: %d\n", gtp->s_queue_array[i].size);
         printk("Queue capacity: %d\n", gtp->s_queue_array[i].capacity);
+        /*
+        gtp->s_queue_array[i].queue_kthread = kthread_run(kt_func, &k_param, "kthread_");
+        if(gtp->s_queue_array[i].queue_kthread != NULL){
+
+        }
+        else{
+
+        }
+        */
+        
+        gtp->s_queue_array[i].queue_kthread = kthread_create(kt_func, &k_param, "kthread_");
+        if(gtp->s_queue_array[i].queue_kthread != NULL){
+            wake_up_process(gtp->s_queue_array[i].queue_kthread);
+        }
+        else{
+
+        }
+        
     }
     
     gtp->hash_size = hsize;

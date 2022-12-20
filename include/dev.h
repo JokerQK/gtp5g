@@ -7,6 +7,14 @@
 
 #include "static_queue.h"
 
+struct kthread_param{
+    // put parameter that you need
+    /*
+    int counter;
+    struct static_queue s_queue_array;
+    */
+};
+
 struct gtp5g_dev {
     struct list_head list;
     struct sock *sk1u;

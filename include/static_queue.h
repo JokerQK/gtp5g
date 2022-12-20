@@ -4,6 +4,9 @@
 //#include <linux/ktime.h>
 //#include <linux/types.h>
 #include <linux/slab.h>
+#include <linux/kthread.h> // for kthread
+#include <linux/sched.h>   // for task_struct
+#include <linux/delay.h>   // for sleep, delay API
 
 #include "pktinfo.h"
 
@@ -19,6 +22,7 @@ struct static_queue {
     int rear;
     int size;
     int capacity;
+    struct task_struct *queue_kthread;
 };
 
 extern void create_s_queue(struct static_queue *, int, int);
